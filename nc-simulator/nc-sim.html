@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NC Toolpath Simulator</title>
+  <link rel="stylesheet" href="nc-sim.css">
+</head>
+<body>
+  <div class="content-wrapper">
+    <h2>NC Toolpath Simulator</h2>
+    <p>Rev: 256</p>
+    <div class="input-wrapper">
+      <input type="file" id="fileInput">
+      <div class="file-name-display" id="fileNameDisplay">No file selected</div>
+    </div>
+  </div>
+  <div class="file-stats" id="fileStats">
+    <span id="lineCount">Lines: 0</span>
+    <span id="charCount">Characters: 0</span>
+  </div>
+    <div class="controls">
+      <button id="undoBtn" title="Undo">&#8630;</button>
+      <button id="saveFileBtn" title="Save File">&#128190;</button>
+      <button id="clearFileBtn" title="Clear File">&#10006;</button>
+      <button id="reloadBtn" title="Reload">&#8635;</button>
+    </div>
+    <div class="active-codes">
+      <div class="code-table-wrapper">
+        <h3>Active G-Codes</h3>
+        <table id="gcodeTable">
+          <thead>
+            <tr><th>Group</th><th>G-Code</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Motion</td><td id="gcodeMotion">G00</td></tr>
+            <tr><td>Plane</td><td id="gcodePlane">G17</td></tr>
+            <tr><td>Units</td><td id="gcodeUnits">G21</td></tr>
+            <tr><td>Distance Mode</td><td id="gcodeDistanceMode">G90</td></tr>
+            <tr><td>Feed Mode</td><td id="gcodeFeedMode">G94</td></tr>
+            <tr><td>Coordinate System</td><td id="gcodeCoordinateSystem">G54</td></tr>
+            <tr><td>Tool Offset</td><td id="gcodeToolOffset">G40</td></tr>
+            <tr><td>Tool Length</td><td id="gcodeToolLength">G49</td></tr>
+            <tr><td>Retract Plane</td><td id="gcodeRetractPlane">G98</td></tr>
+            <tr><td>Plane Rotation</td><td id="gcodeRotation">G69</td></tr>
+            <tr><td>Hole Cycle</td><td id="gcodeHoleCycle">G80</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-table-wrapper">
+        <h3>Active M-Codes</h3>
+        <table id="mcodeTable">
+          <thead>
+            <tr><th>Group</th><th>M-Code</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Spindle</td><td id="mcodeSpindle">M05</td></tr>
+            <tr><td>Coolant</td><td id="mcodeCoolant">M09</td></tr>
+            <tr><td></td><td id="mcode2"></td></tr>
+            <tr><td></td><td id="mcode3"></td></tr>
+            <tr><td></td><td id="mcode4"></td></tr>
+            <tr><td></td><td id="mcode5"></td></tr>
+            <tr><td></td><td id="mcode6"></td></tr>
+            <tr><td></td><td id="mcode7"></td></tr>
+            <tr><td></td><td id="mcode8"></td></tr>
+            <tr><td></td><td id="mcode9"></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table-group">
+        <div class="code-table-wrapper">
+          <h3>Absolute Position</h3>
+          <table id="axisTable">
+            <thead>
+              <tr><th>Axis</th><th>Abs</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>X</td><td id="axisX">0.000</td></tr>
+              <tr><td>Y</td><td id="axisY">0.000</td></tr>
+              <tr><td>Z</td><td id="axisZ">0.000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="code-table-wrapper">
+          <h3>Cutting Parameters</h3>
+          <table id="feedSpeedTable">
+            <thead>
+              <tr><th>Parameter</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Feed (F)</td><td id="feedValue">0.000</td></tr>
+              <tr><td>Spindle (S)</td><td id="speedValue">0.000</td></tr>
+              <tr><td>Tool</td><td id="toolValue">T00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <h2>NC Program:</h2>
+ <div class="content-container">
+  <div id="lineNumbers" class="line-numbers"></div>
+  <div id="contentDiv" contenteditable="true"></div>
+</div>
+    
+    
+    
+    <div class="canvas-wrapper">
+      <canvas id="toolpathCanvas"></canvas>
+    </div>
+    <div class="controls">
+      <button id="playBtn" title="Play">▶</button>
+      <button id="pauseBtn" title="Pause">⏸</button>
+      <button id="resetBtn" title="Reset">⏮</button>
+      <button id="stepBackwardBtn" title="Step Backward">⏪</button>
+      <button id="stepForwardBtn" title="Step Forward">⏩</button>
+      <button id="seekEndBtn" title="Seek End">⏭</button>
+    </div>
+    <div class="zoom-controls">
+      <button id="zoomInBtn" title="Zoom In">+</button>
+      <button id="zoomOutBtn" title="Zoom Out">-</button>
+      <button id="homeBtn" title="Home">🏠</button>
+      <button id="fitBtn" title="Fit">FIT</button>
+    </div>
+    <div class="pan-controls">
+      <button id="panUpBtn" title="Pan Up">↑</button>
+      <button id="panDownBtn" title="Pan Down">↓</button>
+      <button id="panLeftBtn" title="Pan Left">←</button>
+      <button id="panRightBtn" title="Pan Right">→</button>
+    </div>
+    <div class="checkbox-controls">
+      <label><input type="checkbox" id="arrowToggle"> Arrows</label>
+      <label><input type="checkbox" id="drawRangeToggle"> Range</label>
+      <label><input type="checkbox" id="drawBoundToggle"> Bound</label>
+    </div>
+    <div id="rangesDiv"></div>
+    <div id="infosDiv"></div>
+    <div id="warningsDiv"></div>
+    <div id="debugDiv"></div>
+    <button id="clearDebugBtn">Clear Debug</button>
+  </div>
+  <script type="module" src="nc-sim.js"></script>
+</body>
+</html>
